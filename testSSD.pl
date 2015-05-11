@@ -56,6 +56,7 @@ sub read_write {
 			print $fwh $line;
 		}
 		print $fwh "\nFinalizing write test: ";
+		sleep 5 if $debug;
 		print $fwh DateTime->now;
 		$fh->close();
 		$fwh->close();
@@ -78,7 +79,6 @@ sub main {
 	for (my $i=0; $i < $number_of_threads; $i++ ) {
 		$thr[$i]->join();
 		#read_write($filename,$number_of_tests, $i);
-		sleep 5 if $debug;
 		$end[$i] = time;
 		$metrics[$i] = $end[$i] - $start[$i];
 	}
@@ -103,6 +103,10 @@ GetOptions ('verbose' => \$verbose, 'debug' => \$debug, 'file=s' => \$filename,'
 			'thread_number=f' => \$number_of_threads, 'out=s' => \$outfile);
 print "Arguments expected verbose, debug, filename, outfile, number_of_tests, number_of_threads \n" if $verbose;
 print "Arguments received: $verbose, $debug, $filename, $outfile, $number_of_tests, $number_of_threads \n" if $verbose;
+unless (-f $filename) {
+    warn "$filename isnt found";
+    exit(1);
+}
 if ($outfile eq "") {
 	my $ts = DateTime->now;
 	$outfile = "ReadWriteTestReport_$ts.txt"
